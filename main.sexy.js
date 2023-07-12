@@ -89,12 +89,14 @@ function start() {
                     </div>
                     `)
                     await timeout(1000)
-                    console.log(`[FETCHING LRC] =======> ${title}`)
-                  
                     if (nowLRC) {
                         console.log("OVERRIDE AND DELETE PREVIOUS LRC SESSION")
                         nowLRC.pause();
                     }
+                    console.log(`[FETCHING LRC] =======> ${title}`)
+                    let thumbnailUrl = document.getElementById('song-image').getElementsByTagName("img")[0].src
+                   
+                   
                     //
                     let lyric = await fetchLrc(`${title}`)
 
@@ -106,9 +108,10 @@ function start() {
                             color:#6c757d;
                            }
                            .highlighted {
-                            color:#DC3545;
+                            color: #DC3545;
                             font-size: 48px;
                            }
+                           
                            
                         </style>
                         <div style="text-align: left; margin: 10px; margin-top: 50%;">
@@ -124,7 +127,7 @@ function start() {
                     console.log("===============")
 
                     var lrcs = []
-
+                 
                     var lrc = new Lyric({
                         onPlay: function (line, text) { // Listening play event
                             console.log(line, text) // line is line number of current play
@@ -135,7 +138,7 @@ function start() {
                                 color:#6c757d;
                                }
                                .highlighted {
-                                color:#007bff;
+                                color: #007bff;
                                 font-size: 48px;
                                }
                                
