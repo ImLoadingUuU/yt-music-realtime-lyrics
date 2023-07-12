@@ -6,8 +6,6 @@
 // @match        https://music.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        none
-// @license MIT
-// @namespace https://music.youtube.com
 // @require https://cdn.jsdelivr.net/gh/lyswhut/lrc-file-parser@master/dist/lrc-file-parser.min.js
 // ==/UserScript==
 let nowLRC = undefined;
@@ -40,7 +38,7 @@ async function fetchLrc(word) {
     return new Promise(async (resolve) => {
         let lists = await search(word);
         if (!lists.result) {
-          resolve(undefined)
+            resolve(undefined)
         }
         let first = lists.result.songs[0]
         if (first) {
@@ -55,11 +53,11 @@ async function fetchLrc(word) {
     })
 
 }
-function timeout(time){
+function timeout(time) {
     return new Promise((resolve) => {
-     setTimeout(() => {
-       resolve(time)
-     },time)
+        setTimeout(() => {
+            resolve(time)
+        }, time)
     })
 }
 function start() {
@@ -73,36 +71,84 @@ function start() {
 
                 let title = mutation.target.getAttribute("title")
                 if (title) {
-                   await timeout(1000)
+                    updateLyricsContainerHTML(`
+                    <style>
+                       .muted {
+                        color:#6c757d;
+                       }
+                       .highlighted {
+                        color:#007bff;
+                        font-size: 48px;
+                       }
+                       
+                    </style>
+                    <div style="text-align: left; margin: 10px; margin-top: 50%;">
+                    <h2 class="muted">None</h2>
+                    <h1 class="highlighted">Lyrics</h1>
+                    <h2 class="muted">Fetching...</h2>
+                    </div>
+                    `)
+                    await timeout(1000)
                     console.log(`[FETCHING LRC] =======> ${title}`)
+                  
+                    if (nowLRC) {
+                        console.log("OVERRIDE AND DELETE PREVIOUS LRC SESSION")
+                        nowLRC.pause();
+                    }
                     //
                     let lyric = await fetchLrc(`${title}`)
-                    if(!lyric) {
+
+                    if (!lyric) {
                         console.log("[LRC NOT FOUND]")
+                        updateLyricsContainerHTML(`
+                        <style>
+                           .muted {
+                            color:#6c757d;
+                           }
+                           .highlighted {
+                            color:#DC3545;
+                            font-size: 48px;
+                           }
+                           
+                        </style>
+                        <div style="text-align: left; margin: 10px; margin-top: 50%;">
+                        <h2 class="muted">Oops</h2>
+                        <h1 class="highlighted">We don't have lyrics for</h1>
+                        <h2 class="muted">this song</h2>
+                        </div>
+                        `)
                         return
                     }
                     console.log("=======[FETCHED LRC]=======")
                     console.log(lyric)
                     console.log("===============")
-                    if (nowLRC) {
-                        console.log("OVERRIDE AND DELETE PREVIOUS LRC SESSION")
-                        nowLRC.pause();
-                    }
+
                     var lrcs = []
-                
+
                     var lrc = new Lyric({
                         onPlay: function (line, text) { // Listening play event
                             console.log(line, text) // line is line number of current play
                             // text is lyric text of current play line
                             updateLyricsContainerHTML(`
-                            <div style="text-align: center; margin: 10px">
-                            <h1>${text}</h1>
-                            <h2>${lrcs[line + 2] ? text : "..."}</h2>
+                            <style>
+                               .muted {
+                                color:#6c757d;
+                               }
+                               .highlighted {
+                                color:#007bff;
+                                font-size: 48px;
+                               }
+                               
+                            </style>
+                            <div style="text-align: left; margin: 10px; margin-top: 50%;">
+                            <h2 class="muted">${lrcs[line - 1] ? lrcs[line - 1].text : "..."}</h2>
+                            <h1 class="highlighted">${text}</h1>
+                            <h2 class="muted">${lrcs[line + 1] ? lrcs[line + 1].text : "..."}</h2>
                             </div>
                             `)
                         },
                         onSetLyric: function (lines) { // listening lyrics seting event
-                           lrcs = lines
+                            lrcs = lines
                         },
                         offset: 150, // offset time(ms), default is 150 ms
                         playbackRate: 1, // playback rate, default is 1
