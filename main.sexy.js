@@ -6,12 +6,12 @@
 // @match        https://music.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        none
-// @license MIT
+// @licenese MIT
 // @namespace https://music.youtube.com
 // ==/UserScript==
 // Inject JS
 (async () => {
-    function injectJS(url,type) {
+    function injectJS(url, type) {
         return new Promise((resolve) => {
             let script = document.createElement("script")
             script.src = url
@@ -27,7 +27,7 @@
         })
     }
     await injectJS("https://cdn.jsdelivr.net/gh/lyswhut/lrc-file-parser@master/dist/lrc-file-parser.min.js")
-    await injectJS("https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.0.1/dist/cdn/material-dynamic-colors.min.js","module")
+    await injectJS("https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.0.1/dist/cdn/material-dynamic-colors.min.js", "module")
     let nowLRC = undefined;
 
     let lrcs = {
@@ -104,6 +104,13 @@
             }
         }
     })
+    document.querySelector("#progress-bar").addEventListener("click", () => {
+        console.log("Progressbar Clicked")
+        if (nowLRC) {
+            nowLRC.play(document.getElementsByTagName("video")[0].currentTime * 1000);
+        }
+    })
+
     function start() {
         let element = document.querySelector("html.no-focus-outline body ytmusic-app ytmusic-app-layout#layout.style-scope.ytmusic-app ytmusic-player-bar.style-scope.ytmusic-app div.middle-controls.style-scope.ytmusic-player-bar div.content-info-wrapper.style-scope.ytmusic-player-bar yt-formatted-string.title.style-scope.ytmusic-player-bar")
         let artistElement = document.querySelector("html.no-focus-outline body ytmusic-app ytmusic-app-layout#layout.style-scope.ytmusic-app ytmusic-player-bar.style-scope.ytmusic-app div.middle-controls.style-scope.ytmusic-player-bar div.content-info-wrapper.style-scope.ytmusic-player-bar span.byline-wrapper.style-scope.ytmusic-player-bar span.subtitle.style-scope.ytmusic-player-bar yt-formatted-string.byline.style-scope.ytmusic-player-bar.complex-string").children[0]
